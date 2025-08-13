@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <script
+      defer
+      src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"
+    ></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+      :root {
+        font-size: 62.5%;
+      }
+      body {
+        font-size: 1.6rem;
+      }
+      dialog{
+        max-width: none;
+        max-height: none;
+      }
+      dialog::backdrop{
+        background-color: #00000063;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div
+      class="main-container h-screen relative grid grid-rows-[5.5rem_calc(100vh-(calc(5.5rem+10rem)))_10rem]"
+      x-data="{
+        showDialog: false,
+        todos: [
+            {
+                id: 1,
+                title: 'Finish Math Homework',
+                date: '2025-08-20',
+                priority: 'high',
+                completed: false,
+            },
+            {
+                id: 2,
+                title: 'Buy Groceries',
+                date: '2025-08-25',
+                priority: 'medium',
+                completed: false,
+            },
+            {
+                id: 3,
+                title: 'Clean Kitchen',
+                date: '2025-08-22',
+                priority: 'medium',
+                completed: false,
+            },
+            {
+                id: 4,
+                title: 'Fix TV',
+                date: '2025-08-24',
+                priority: 'low',
+                completed: false,
+            },
+        ],
+        openDialog: function(){
+            this.showDialog = true
+            this.$refs.dialog.showModal()
+        },
+
+        closeDialog: function(){
+            this.showDialog = false
+            this.todoForm = {}
+            this.editMode = false
+            this.$refs.dialog.close()
+        },
+
+        todoForm: {
+            title: '',
+            desc: '',
+            date: '',
+            priority: ''
+        },
+
+        todoFormSubmit: function(){
+            let newTodo = {
+                id: this.todos.length + 1,
+                title: this.todoForm.title,
+                date: this.todoForm.date,
+                priority: this.todoForm.priority
+            }
+
+            this.todos.unshift(newTodo)
+            this.closeDialog()
+            this.todoForm = {}
+        },
+
+        editMode: false,
+        editTodo: function(id){
+            this.openDialog()
+            this.editMode = true
+            let editTodo = this.todos.filter((todo) => todo.id == id)[0]
+            this.todoForm = editTodo
+        },
+
+        updateTodo: function(id){
+            this.todos = this.todos.map((todo) => {
+                if(todo.id == id){
+                    return {
+                        ...todo,
+                        ...this.todoForm
+                    }
+                }
+                return todo
+            })
+
+            this.editMode = false
+            this.todoForm = {}
+            this.closeDialog()
+        },
+
+        deleteTodo: function(id){
+            if(confirm('Are you sure you want to delete this todo?')){
+                this.todos = this.todos.filter(todo => todo.id !== id)
+                this.closeDialog()
+            }
+
+        }
+    }"
+    >
+      <nav
+        class="top-nav p-[1.2rem_2rem] bg-neutral-700 shadow-lg text-white flex items-center justify-between"
+      >
+        <h2 class="text-[2rem] font-bold">Todos</h2>
+      </nav>
+      <div
+        class="bg-neutral-900 p-[1.5rem] pb-[calc(calc(7.5rem/2)+2rem)] overflow-auto"
+      >
+        <div class="todos-container grid grid-cols-[repeat(auto-fill,minmax(min(100%,25rem),1fr))] gap-[1.5rem]">
+          <template x-for="todo in todos" :key="todo.id">
+            <div
+              class="todo grid grid-cols-[1.6rem_1fr_7.5rem] gap-[1rem] bg-neutral-700 rounded-lg p-[1.2rem]"
+              @click="editTodo(todo.id)"
+            >
+              <div class="completed-checkbox col-1 row-[1/span_2] flex items-center">
+                <input
+                  type="checkbox"
+                  name=""
+                  id=""
+                  class="w-[1.6rem] h-[1.6rem]"
+                />
+              </div>
+              <div
+                class="task-title text-white text-[2rem] col-[2/span_2] row-1 leading-[1.1]"
+                x-text="todo.title"
+              ></div>
+              <div
+                class="task-start-time text-neutral-400 text-[1.6rem] leading-[1.1] col-2 row-2"
+                x-text="todo.date"
+              ></div>
+              <div class="task-priority rounded-full text-[1.4rem] p-[0.5rem] col-3 row-2 capitalize text-center" x-text="todo.priority" :class="todo.priority == 'high' ?  'bg-red-300 border-2 border-red-900 text-red-900' : todo.priority == 'medium' ? 'bg-yellow-300 border-2 border-yellow-900 text-yellow-900' : 'bg-blue-300 border-2 border-blue-900 text-blue-900'"></div>
+            </div>
+          </template>
+        </div>
+      </div>
+      <nav class="bottom-nav bg-neutral-700 p-[2rem] z-[20] relative">
+        <button
+          type="button"
+          class="add-todo absolute left-[50%] translate-x-[-50%] bg-purple-400 h-[7.5rem] w-[7.5rem] rounded-full bottom-[calc(100%-calc(7.5rem/2))] flex items-center justify-center"
+          @click="openDialog()"
+        >
+          <i data-lucide="plus" class="text-white w-[3.5rem] h-[3.5rem]"></i>
+        </button>
+      </nav>
+
+      <dialog x-ref="dialog" @close="closeDialog()" class="w-full bg-transparent h-full overflow-y-auto" :class="showDialog == true ? 'flex items-center justify-center' :''">
+        <div class="dialog-container h-auto max-h-[90%] w-[min(90%,55rem)] bg-neutral-700 rounded-2xl p-[1.5rem] my-auto text-white relative">
+            <button type="button" class="w-[3.5rem] h-[3.5rem] rounded-full bg-black flex items-center justify-center absolute top-[calc(-1*(calc(3.5rem/2)))] right-[calc(-1*(calc(3.5rem/2)))] border border-white cursor-pointer" @click="closeDialog()">
+                <i data-lucide="x" class="text-white w-1/2 h-1/2"></i>
+            </button>
+            <h2 class="border-b-2 border-neutral-500 pb-[1rem] text-[2rem] text-center" x-show="!editMode">Add Todo</h2>
+            <h2 class="border-b-2 border-neutral-500 pb-[1rem] text-[2rem] text-center" x-show="editMode">Edit Todo</h2>
+            <form @submit.prevent="todoFormSubmit()" class="pt-[2rem] flex flex-col gap-[1.2rem]">
+                <div class="form-group">
+                    <input type="text" name="" id="" class="form-control border-2 border-neutral-500 rounded-md p-[1.2rem] text-[1.5rem] w-full" placeholder="Todo Title" x-model="todoForm.title">
+                </div>
+                <div class="form-group">
+                    <textarea name="" id="" class="form-control border-2 border-neutral-500 rounded-md p-[1.2rem] text-[1.5rem] w-full" placeholder="Todo Description" x-model="todoForm.desc"></textarea>
+                </div>
+                <div class="form-group">
+                    <input type="date" name="" id="" class="form-control border-2 border-neutral-500 rounded-md p-[1.2rem] text-[1.5rem] w-full" x-model="todoForm.date">
+                </div>
+                <div class="form-group">
+                    <select name="" id="" class="form-control border-2 border-neutral-500 rounded-md p-[1.2rem] text-[1.5rem] w-full bg-neutral-700 text-white" x-model="todoForm.priority">
+                        <option value="">Select Todo Priority</option>
+                        <option value="high">High</option>
+                        <option value="medium">Medium</option>
+                        <option value="low">Low</option>
+                    </select>
+                </div>
+                <div class="form-action flex justify-center gap-[1.5rem]">
+                    <button type="submit" class="text-[1.8rem] p-[0.75rem_2rem] min-w-[8.5rem] text-white rounded-full bg-purple-400 text-center" x-show="!editMode">Add</button>
+                    <button type="button" class="text-[1.8rem] p-[0.75rem_2rem] min-w-[8.5rem] text-white rounded-full bg-red-400 text-center" x-show="editMode" @click="deleteTodo(todoForm.id)">Delete</button>
+                    <button type="button" class="text-[1.8rem] p-[0.75rem_2rem] min-w-[8.5rem] text-white rounded-full bg-purple-400 text-center" x-show="editMode" @click="updateTodo(todoForm.id)">Update</button>
+                </div>
+            </form>
+        </div>
+      </dialog>
+    </div>
+  </body>
+
+  <script>
+    lucide.createIcons();
+  </script>
+</html>
