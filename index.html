@@ -81,7 +81,20 @@
             priority: ''
         },
 
+        errMessages: [],
+
+        validateTodoForm: function(){
+            this.errMessages = []
+            Object.keys(this.todoForm).map(todo => {
+                if(todo !== 'desc' && this.todoForm[todo] == ''){
+                    this.errMessages.push(`${todo} is required`)
+                }
+            })
+        },
+
         todoFormSubmit: function(){
+            this.validateTodoForm();
+            if(this.errMessages.length == 0){
             let newTodo = {
                 id: this.todos.length + 1,
                 title: this.todoForm.title,
@@ -92,6 +105,7 @@
             this.todos.unshift(newTodo)
             this.closeDialog()
             this.todoForm = {}
+            }
         },
 
         editMode: false,
@@ -103,6 +117,10 @@
         },
 
         updateTodo: function(id){
+
+            this.validateTodoForm();
+
+            if(this.errMessages.length == 0){
             this.todos = this.todos.map((todo) => {
                 if(todo.id == id){
                     return {
@@ -116,6 +134,7 @@
             this.editMode = false
             this.todoForm = {}
             this.closeDialog()
+            }
         },
 
         deleteTodo: function(id){
@@ -180,6 +199,11 @@
             <h2 class="border-b-2 border-neutral-500 pb-[1rem] text-[2rem] text-center" x-show="!editMode">Add Todo</h2>
             <h2 class="border-b-2 border-neutral-500 pb-[1rem] text-[2rem] text-center" x-show="editMode">Edit Todo</h2>
             <form @submit.prevent="todoFormSubmit()" class="pt-[2rem] flex flex-col gap-[1.2rem]">
+                <ul class="error-list list-disc pl-[1.5rem]" x-show="errMessages.length > 0">
+                    <template x-for="err in errMessages" :key="err">
+                        <li x-text="err" class="text-red-400"></li>
+                    </template>
+                </ul>
                 <div class="form-group">
                     <input type="text" name="" id="" class="form-control border-2 border-neutral-500 rounded-md p-[1.2rem] text-[1.5rem] w-full" placeholder="Todo Title" x-model="todoForm.title">
                 </div>
