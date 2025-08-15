@@ -279,7 +279,7 @@
                   />
                 </div>
                 <div
-                  class="task-title text-white text-[2rem] col-[2/span_2] row-1 leading-[1.1]"
+                  class="task-title text-white text-[2rem] col-[2/span_1] row-1 leading-[1.1]"
                   x-text="todo.title"
                 ></div>
                 <div
@@ -455,8 +455,8 @@
             Edit Todo
           </h2>
           <form
-            @submit.prevent="todoFormSubmit()"
             class="pt-[2rem] flex flex-col gap-[1.2rem]"
+            @submit.prevent=""
           >
             <ul
               class="error-list list-disc pl-[1.5rem]"
@@ -512,9 +512,10 @@
             </div>
             <div class="form-action flex justify-center gap-[1.5rem]">
               <button
-                type="submit"
+                type="button"
                 class="text-[1.8rem] p-[0.75rem_2rem] min-w-[8.5rem] text-white rounded-full bg-purple-400 text-center cursor-pointer"
                 x-show="!editMode"
+                @click="todoFormSubmit()"
               >
                 Add
               </button>
