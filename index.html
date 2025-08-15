@@ -128,8 +128,12 @@
         editTodo: function(id){
             this.openDialog()
             this.editMode = true
-            let editTodo = this.todos.filter((todo) => todo.id == id)[0]
-            this.todoForm = editTodo
+            let editTodo = this.todos.filter((todo) => todo.id == id)[0] ?? this.completedTodos.filter((todo) => todo.id == id)[0]
+            if(editTodo){
+              this.todoForm = editTodo
+            }else{
+
+            }
         },
 
         openDialog: function(){
