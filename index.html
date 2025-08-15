@@ -94,29 +94,7 @@
             desc: '',
             date: '',
             priority: ''
-        },
-        openDialog: function(){
-            this.showDialog = true
-            this.$refs.dialog.showModal()
-        },
-
-        closeDialog: function(){
-          if(!this.editMode){
-            this.showDialog = false
-            this.editMode = false
-            this.todoForm = {
-                title: '',
-                desc: '',
-                date: '',
-                priority: ''
-            };
-            this.errMessages = []
-            this.$refs.dialog.close()
-          }
-          if(this.errMessages.length == 0){
-            return
-          }
-        },
+        },      
 
         validateTodoForm: function(){
             this.errMessages = []
@@ -152,6 +130,42 @@
             this.editMode = true
             let editTodo = this.todos.filter((todo) => todo.id == id)[0]
             this.todoForm = editTodo
+        },
+
+        openDialog: function(){
+            this.showDialog = true
+            this.$refs.dialog.showModal()
+        },
+
+        closeDialog: function(){
+          if(!this.editMode){
+            this.showDialog = false
+            this.editMode = false
+            this.todoForm = {
+                title: '',
+                desc: '',
+                date: '',
+                priority: ''
+            };
+            this.errMessages = []
+            this.$refs.dialog.close()
+          }
+          if(this.editMode){
+            if(this.errMessages.length > 0){
+              return
+            }else{
+              this.showDialog = false
+              this.editMode = false
+              this.todoForm = {
+                  title: '',
+                  desc: '',
+                  date: '',
+                  priority: ''
+              };
+              this.errMessages = []
+              this.$refs.dialog.close()
+            }
+          }
         },
 
         updateTodo: function(id){
@@ -413,7 +427,7 @@
 
       <dialog
         x-ref="dialog"
-        @keydown.escape.prevent="if(errMessages.length == 0 && !this.editMode) closeDialog()"
+        @keydown.escape.prevent="closeDialog()"
         @close="closeDialog()"
         class="w-full bg-transparent h-full overflow-y-auto"
         :class="showDialog == true ? 'flex items-center justify-center' :''"
@@ -499,7 +513,7 @@
             <div class="form-action flex justify-center gap-[1.5rem]">
               <button
                 type="submit"
-                class="text-[1.8rem] p-[0.75rem_2rem] min-w-[8.5rem] text-white rounded-full bg-purple-400 text-center"
+                class="text-[1.8rem] p-[0.75rem_2rem] min-w-[8.5rem] text-white rounded-full bg-purple-400 text-center cursor-pointer"
                 x-show="!editMode"
               >
                 Add
@@ -514,7 +528,7 @@
               </button> -->
               <button
                 type="button"
-                class="text-[1.8rem] p-[0.75rem_2rem] min-w-[8.5rem] text-white rounded-full bg-purple-400 text-center"
+                class="text-[1.8rem] p-[0.75rem_2rem] min-w-[8.5rem] text-white rounded-full bg-purple-400 text-center cursor-pointer"
                 x-show="editMode"
                 @click="updateTodo(todoForm.id)"
               >
